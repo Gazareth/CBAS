@@ -134,6 +134,7 @@ _declspec(naked) void AttackSpeedHook(void)
 	Messaging API example
 *************************/
 
+#ifdef _DEBUG
 OBSEMessagingInterface* g_msg;
 
 void MessageHandler(OBSEMessagingInterface::Message* msg)
@@ -170,6 +171,8 @@ void MessageHandler(OBSEMessagingInterface::Message* msg)
 		break;
 	}
 }
+
+#endif
 
 extern "C" {
 
@@ -268,6 +271,7 @@ bool OBSEPlugin_Load(const OBSEInterface * obse)
 		g_scriptInterface = (OBSEScriptInterface*)obse->QueryInterface(kInterface_Script);
 	}
 
+#ifdef _DEBUG
 	// register to receive messages from OBSE
 	OBSEMessagingInterface* msgIntfc = (OBSEMessagingInterface*)obse->QueryInterface(kInterface_Messaging);
 	msgIntfc->RegisterListener(g_pluginHandle, "OBSE", MessageHandler);
@@ -285,6 +289,7 @@ bool OBSEPlugin_Load(const OBSEInterface * obse)
 	else {
 		_MESSAGE("Couldn't read command table");
 	}
+#endif
 
 	return true;
 }

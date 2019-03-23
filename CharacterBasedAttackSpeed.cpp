@@ -394,7 +394,9 @@ float EncumbranceFactor(Actor* a, SInt32 STR, float fComplex){
 //Using a threshold, below which weapon speed starts to be impacted
 float FatigueFactor(Actor* a, UInt32 baseFatigue,float fatigueThreshold){
 	float fatigue = float(a->GetActorValue(kActorVal_Fatigue))/float(baseFatigue);
+#ifdef _DEBUG
 	_MESSAGE("Getting fatigue... curr %i base %i ratio %f thresh: %f",a->GetActorValue(kActorVal_Fatigue),a->GetBaseActorValue(kActorVal_Fatigue),fatigue,fatigueThreshold);
+#endif
 	return min(max(0.f,fatigue/fatigueThreshold),1.f);
 }
 
