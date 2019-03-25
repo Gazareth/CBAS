@@ -259,6 +259,11 @@ bool OBSEPlugin_Load(const OBSEInterface * obse)
 		//initialises ini object
 		AA->GetIniValues();
 
+		if(  !(*CBAS_IniHandler)(CBAS_Config::IniEntries::CBAS_Enabled) ) {
+			_MESSAGE("[CharacterBasedAttackSpeed] -- has been set to disabled in the INI file.");
+			_MESSAGE("[CharacterBasedAttackSpeed] disabled.");
+			return false;
+		}
 		//hook attack speed algorithm on to location where it is
 		WriteRelJump (AttackSpeedInstruction, (UInt32)&AttackSpeedHook);
 

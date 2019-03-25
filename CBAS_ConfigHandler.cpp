@@ -5,17 +5,24 @@
 namespace CBAS_Config
 {
 
-IniEntry::IniEntry(const char* h,const char* n, float v) : name(n), header(h),value(v) {}
+IniEntry::IniEntry(const char* h,const char* n, float v, IniValTypes t) 
+	: 
+	name(n),
+	header(h),
+	value(v),
+	type(t) {}
 
 
 
 //Arrays for quick reading from ini file
 static char* CBAS_HeadingsStrings[CBAS_EndHeadings] = {
+	"Meta",
 	"Components",
 	"Settings"
 };
 
 static IniEntry* CBAS_IniEntries[CBAS_EndEntries] = {
+	new IniEntry(CBAS_HeadingsStrings[CBAS_Meta],"bCBAS_Enabled",false,CBAS_iniBool),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Fatigue",1.f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Encumbrance",1.f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Skill",1.f),
@@ -56,7 +63,15 @@ IniHandler::IniHandler() : bUseAllComponents(false)
 		for(UInt32 i=0; i<CBAS_EndEntries; i++){
 			IniEntry* iniE = CBAS_IniEntries[i];
 
-			CBAS_IniEntries[i]->value = reader.GetReal(iniE->header, iniE->name, iniE->value);
+			switch( iniE->type ){
+				case CBAS_iniFloat: 
+					CBAS_IniEntries[i]->value = reader.GetReal(iniE->header, iniE->name, iniE->value);
+					break;
+				case CBAS_iniBool:
+					CBAS_IniEntries[i]->value = (float)reader.GetBoolean(iniE->header, iniE->name, iniE->value);
+					break;
+			}
+
 #if _DEBUG
 			_MESSAGE("[Character-Based Attack Speed] Read: [%s]: %s = %f",iniE->header, iniE->name, iniE->value);
 #endif

@@ -3,8 +3,15 @@
 
 namespace CBAS_Config
 {
+	static enum IniValTypes {
+		CBAS_iniFloat,
+		CBAS_iniBool,
+		CBAS_iniInt
+	};
+
 	static enum IniHeadings
 	{
+		CBAS_Meta,
 		CBAS_Components,
 		CBAS_Settings,
 		CBAS_EndHeadings
@@ -12,6 +19,8 @@ namespace CBAS_Config
 
 	enum IniEntries
 	{
+		CBAS_Enabled,
+
 		CBAS_FatigueComponent,
 		CBAS_EncumbranceComponent,
 		CBAS_SkillComponent,
@@ -30,7 +39,9 @@ struct IniEntry {
 	const char* header;
 	float value;
 
-	IniEntry(const char* h,const char* n, float v);
+	IniValTypes type;
+
+	IniEntry(const char* h,const char* n, float v, IniValTypes t = CBAS_iniFloat);
 };
 
 

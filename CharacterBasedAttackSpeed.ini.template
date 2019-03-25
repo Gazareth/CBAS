@@ -1,3 +1,6 @@
+[Meta]
+bCBAS_Enabled = true		; For convenience: setting to false disables all functionality (except loading up and checking this file)
+
 ; The following are ratios from 0-1 for how much each component affects attack speed
 ; 0 means no penalty comes from this component
 ; all set to 0 means attack speed is always as fast as possible (this is much faster than vanilla)
