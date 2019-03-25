@@ -81,10 +81,13 @@ _declspec(naked) void AttackSpeedHook(void)
 			//5 - neutral power attack
 			//6	- forward power attack
 			//7 - backwards power attack
-			//8 - 
-			//9 - Right power attack
+			//8 - left power attack
+			//9 - right power attack
+			// ??? danger zone
 		cmp edx, 2
 		jb originalcode
+		cmp edx, 9
+		ja originalcode
 		mov edx,[ecx+0x14]			//this catches the weird pseudo player object that gets passed through the attack function before the player actor
 		test edx, edx
 		jz originalcode
