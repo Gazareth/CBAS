@@ -70,8 +70,7 @@ _declspec(naked) void AttackSpeedHook(void)
 		push ah		//store current ah
 		lahf		//put current flags into ah
 		push ah		//store new ah
-		mov ecx,[esi+0x4]
-				//branch off here to do some tests to make sure we are gonna get an actor
+			//branch off here to do some tests to make sure we are gonna get an actor
 			//edx:
 			//0 - unsheathing weapon
 			//1 - ???
@@ -88,6 +87,7 @@ _declspec(naked) void AttackSpeedHook(void)
 		jb originalcode
 		cmp edx, 9
 		ja originalcode
+		mov ecx,[esi+0x4]
 		mov edx,[ecx+0x14]			//this catches the weird pseudo player object that gets passed through the attack function before the player actor
 		test edx, edx
 		jz originalcode
