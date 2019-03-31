@@ -23,14 +23,16 @@ OBSEScriptInterface * g_scriptInterface = NULL;	// make sure you assign to this
 #include "obse_editor/EditorAPI.h"
 #endif
 
-#include "AttackingActor.h"
+#include "CBAS_Actor.h"
 
-#include "obse/ParamInfos.h"
+//#include "obse/ParamInfos.h"
 #include "obse/Script.h"
-#include "obse/GameObjects.h"
-#include "obse/GameActorValues.h"
-#include "Utilities.h"
-#include <string>
+//#include "obse/GameObjects.h"
+//#include "obse/NiExtraData.h"
+//#include "obse/GameProcess.h"
+//#include "obse/GameActorValues.h"
+//#include "Utilities.h"
+//#include <string>
 
 IDebugLog		gLog("Data/OBSE/Plugins/logs/CharacterBasedAttackSpeed.log");
 
@@ -40,7 +42,7 @@ OBSEArrayVarInterface		* g_arrayIntfc = NULL;
 OBSEScriptInterface			* g_scriptIntfc = NULL;
 OBSECommandTableInterface* cmdIntfc = NULL;
 
-
+//CBAS
 static UInt32 AttackSpeedInstruction = 0x477086;
 static UInt32 nextInstruction = 0x47708C;
 
@@ -50,13 +52,13 @@ static UInt32 nextInstruction = 0x47708C;
 /*************************
 	Game code hook with variables
 *************************/
+CBAS_Actors CBAS_Actors_;
+CBAS_Actors* g_cbasActors = &CBAS_Actors_;
 
-void* maybe_actor;
-Actor* AttackingActor;
-AttackingActors AttackingActors_;
-AttackingActors* AA = &AttackingActors_;
+void* p_aad;		//pointer to actor anim data
 
-float attackSpeed = DEFAULT_ATTACK_SPEED;
+void* ESI_REGISTER;
+
 
 _declspec(naked) void AttackSpeedHook(void)
 {
@@ -70,12 +72,11 @@ _declspec(naked) void AttackSpeedHook(void)
 		push ah		//store current ah
 		lahf		//put current flags into ah
 		push ah		//store new ah
-			//branch off here to do some tests to make sure we are gonna get an actor
 			//edx:
 			//0 - unsheathing weapon
-			//1 - ???
+			//1 - sheathing weapon
 			//2 - bow	
-			//3 - blocking attack??
+			//3 - backswing (chain from normal atk)
 			//4 - normal attack
 			//5 - neutral power attack
 			//6	- forward power attack
@@ -83,40 +84,13 @@ _declspec(naked) void AttackSpeedHook(void)
 			//8 - left power attack
 			//9 - right power attack
 			// ??? danger zone
-		cmp edx, 2
-		jb originalcode
-		cmp edx, 9
-		ja originalcode
-		mov ecx,[esi+0x4]
-		mov edx,[ecx+0x14]			//this catches the weird pseudo player object that gets passed through the attack function before the player actor
-		test edx, edx
-		jz originalcode
-
-		mov ecx,[ecx+0x10]
-		mov ecx,[ecx+0x8]
-		mov ecx,[ecx+0xC]			//actor
-		mov maybe_actor, ecx
-		//jmp originalcode_
+		mov p_aad, esi
 	}
 	
-	AttackingActor = reinterpret_cast<Actor*>(maybe_actor);
+	g_cbasActors->SetAttackSpeed(p_aad);
 
-	if( AttackingActor ){
-		//_MESSAGE("Got pointer %p!!",AttackingActor);
-		//_MESSAGE("	actor is %s!",GetFullName(AttackingActor));
-		//_MESSAGE("	actor is %s [%x]!",GetFullName(AttackingActor),AttackingActor->refID);
-		attackSpeed = AA->GetDesiredAttackSpeed(AttackingActor);
-	}
-#if _DEBUG
-	else {
-		_MESSAGE("Could not get actor object from pointer!");
-	}
-#endif
+
 	_asm {
-		fld attackSpeed
-		fstp dword ptr [esi+0xC0]		//store value in esi+C0 to be picked up by original code
-	originalcode:
-		fld dword ptr[esi+0xC0]		//run original code
 		pop ah			//restore stored flags into ah
 		sahf			//restore flags
 		pop ah			//restore ah from before 
@@ -124,6 +98,7 @@ _declspec(naked) void AttackSpeedHook(void)
 		pop edx
 		pop ecx
 		pop eax
+		fld dword ptr[esi+0xC0]				//load weapon speed onto floating point stack	-- this was the original instruction
 		jmp nextInstruction					//jump back to next instruction in base game code	
 	}
 }
@@ -260,7 +235,7 @@ bool OBSEPlugin_Load(const OBSEInterface * obse)
 	if(!obse->isEditor)
 	{
 		//initialises ini object
-		AA->GetIniValues();
+		g_cbasActors->LoadIniValues();
 
 		if(  !(*CBAS_IniHandler)(CBAS_Config::IniEntries::CBAS_Enabled) ) {
 			_MESSAGE("[CharacterBasedAttackSpeed] -- has been set to disabled in the INI file.");

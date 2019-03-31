@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\obse\obse\GameActorValues.cpp" />
+    <ClCompile Include="..\obse\obse\GameAPI.cpp" />
+    <ClCompile Include="..\obse\obse\GameBSExtraData.cpp" />
+    <ClCompile Include="..\obse\obse\GameData.cpp" />
+    <ClCompile Include="..\obse\obse\GameExtraData.cpp" />
+    <ClCompile Include="..\obse\obse\GameForms.cpp" />
+    <ClCompile Include="..\obse\obse\GameObjects.cpp" />
+    <ClCompile Include="..\obse\obse\GameTasks.cpp" />
+    <ClCompile Include="..\obse\obse\GameTypes.cpp" />
+    <ClCompile Include="..\obse\obse\NiAPI.cpp" />
+    <ClCompile Include="..\obse\obse\NiNodes.cpp" />
+    <ClCompile Include="..\obse\obse\NiRTTI.cpp" />
+    <ClCompile Include="..\obse\obse\Script.cpp" />
+    <ClCompile Include="..\obse\obse\Utilities.cpp" />
+    <ClCompile Include="..\obse\StdAfx.cpp" />
+    <ClCompile Include="dllmain.c" />
+    <ClCompile Include="main.cpp">
+      <Filter>CBAS</Filter>
+    </ClCompile>
+    <ClCompile Include="CBAS_ActorAnimData.cpp" />
+    <ClCompile Include="CBAS_Actor.cpp">
+      <Filter>CBAS</Filter>
+    </ClCompile>
+    <ClCompile Include="CBAS_Lib.cpp">
+      <Filter>CBAS</Filter>
+    </ClCompile>
+    <ClCompile Include="CBAS_Config.cpp">
+      <Filter>CBAS</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\obse\obse\GameActorValues.h" />
+    <ClInclude Include="..\obse\obse\GameAPI.h" />
+    <ClInclude Include="..\obse\obse\GameBSExtraData.h" />
+    <ClInclude Include="..\obse\obse\GameData.h" />
+    <ClInclude Include="..\obse\obse\GameExtraData.h" />
+    <ClInclude Include="..\obse\obse\GameForms.h" />
+    <ClInclude Include="..\obse\obse\GameObjects.h" />
+    <ClInclude Include="..\obse\obse\GameTasks.h" />
+    <ClInclude Include="..\obse\obse\GameTypes.h" />
+    <ClInclude Include="..\obse\obse\NiAPI.h" />
+    <ClInclude Include="..\obse\obse\NiNodes.h" />
+    <ClInclude Include="..\obse\obse\NiRTTI.h" />
+    <ClInclude Include="..\obse\obse\ParamInfos.h" />
+    <ClInclude Include="..\obse\obse\PluginAPI.h" />
+    <ClInclude Include="..\obse\obse\Script.h" />
+    <ClInclude Include="..\obse\obse\Utilities.h" />
+    <ClInclude Include="..\obse\StdAfx.h" />
+    <ClInclude Include="inih\INIReader.h" />
+    <ClInclude Include="CBAS_ActorAnimData.h" />
+    <ClInclude Include="CBAS_Actor.h">
+      <Filter>CBAS</Filter>
+    </ClInclude>
+    <ClInclude Include="CBAS_Lib.h">
+      <Filter>CBAS</Filter>
+    </ClInclude>
+    <ClInclude Include="CBAS_Config.h">
+      <Filter>CBAS</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\obse\obse\GameRTTI_1_1.inl" />
+    <None Include="..\obse\obse\GameRTTI_1_2.inl" />
+    <None Include="..\obse\obse\GameRTTI_1_2_416.inl" />
+    <None Include="exports.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CBAS">
+      <UniqueIdentifier>{918a562b-8575-4724-bbfc-f15ab06ddf34}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

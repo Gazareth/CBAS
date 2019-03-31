@@ -1,4 +1,4 @@
-#include "CBAS_ConfigHandler.h"
+#include "CBAS_Config.h"
 
 #define INI_PATH "Data\\OBSE\\Plugins\\CharacterBasedAttackSpeed.ini"
 

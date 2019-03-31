@@ -1,4 +1,5 @@
-#include "CharacterBasedAttackSpeed.h"
+#include "CBAS_Lib.h"
+
 
 /***************************
 * OBSE and Game code
@@ -256,7 +257,7 @@ static bool FindEquippedWeapon(TESObjectREFR* thisObj, UInt32 slotIdx, FoundEqui
 
 
 //This is a custom version of Cmd_GetEquipmentSlotType_Execute from Commands_Inventory.cpp, reduced to only require necessary arguments
-TESObjectWEAP* GetEquippedWeapon(TESObjectREFR * thisObj)
+CBAS_Weapon* GetEquippedWeapon(TESObjectREFR * thisObj)
 {
 	//a double with a pointer to it is required by FindEquippedWeapon
 	double resultVal = 0;
@@ -267,11 +268,17 @@ TESObjectWEAP* GetEquippedWeapon(TESObjectREFR * thisObj)
 	UInt32	slotIdx = TESBipedModelForm::kPart_Max; //_TESBipedModelForm::kPart_Max is 16 -- the weapon slot
 	feGetObject getObject;
 
-	bool bFound = FindEquippedWeapon(thisObj, slotIdx, &getObject, result);
+	//bool bFound = ;
+	CBAS_Weapon* wep;
 
-	TESObjectWEAP* eqObj = (TESObjectWEAP*)LookupFormByID(*refResult);
+	if( FindEquippedWeapon(thisObj, slotIdx, &getObject, result) ) { 
+		TESObjectWEAP* Wep = (TESObjectWEAP*)LookupFormByID(*refResult);
+		wep = new CBAS_Weapon(Wep->weight.weight,Wep->refID,Wep->type);
+	} else {
+		wep = new CBAS_Weapon();
+	}
 
-	return eqObj;
+	return wep;
 }
 
 
@@ -298,7 +305,7 @@ static float EncumbranceMultiplier(){
 * CharacterBasedAttackSpeed Functions
 ***************************/
 
-namespace CBAS {
+namespace CBAS_Lib {
 
 
 // - SkillFactor -
@@ -307,9 +314,7 @@ namespace CBAS {
 float SkillFactor(Actor* a, UInt32 wepType) {
 	float skillVal = 100.f;
 	UInt32 skillToGet = WepTypeSkillMap[wepType];
-#if _DEBUG
-			_MESSAGE("	Using 0x%x as skill for skill factor.",skillToGet);
-#endif
+_DOUT("	Using 0x%x as skill for skill factor.",skillToGet);
 
 	skillVal = skillToGet == kActorVal_OblivionMax ? 100.f : a->GetActorValue(skillToGet);
 	return skillVal/100.f;
@@ -329,19 +334,13 @@ float AttrFactor(Actor* a, SInt32 STR, UInt32 wepType, float wepWeight) {
 	
 	if(wepType < kType_Staff){			//melee
 			attrF = float(STR)/wepWeight;
-#if _DEBUG
-			_MESSAGE("	Using STR as attribute factor because melee weapon.");
-#endif
+_DOUT("	Using STR as attribute factor because melee weapon.");
 	} else if(wepType < kType_Bow){		//staff
 		attrF = (a->GetActorValue(kActorVal_Intelligence) + a->GetActorValue(kActorVal_Willpower))*.125f/wepWeight; //staffs can have weight as low as 5, high as 12, so contribution is further halved to give .125
-#if _DEBUG
-			_MESSAGE("	Using INT+WILL as attribute factor because staff.");
-#endif
+_DOUT("	Using INT+WILL as attribute factor because staff.");
 	} else if(wepType < kType_Max) {	//bow
 		attrF = a->GetActorValue(kActorVal_Agility)*.25f/wepWeight;		//bows can have weight as low as 8 and high as 22 so contribution from agility halved
-#if _DEBUG
-			_MESSAGE("	Using AGI as attribute factor because bow.");
-#endif
+_DOUT("	Using AGI as attribute factor because bow.");
 	}
 
 	return PRSNK_FACTOR(attrF);
@@ -383,9 +382,8 @@ float EncumbranceFactor(Actor* a, SInt32 STR, float fComplex){
 		fComplex = fComplex*((ChestVal+HandsVal)*.5f);	//complex ratio contribution gets diminished, after finding average of chest/hands values
 	}
 
-#if _DEBUG
-	//_MESSAGE("Returning encumbrance factor of %f -- Complex: [%f] Total: [%f]",(fComplex + T_Encumbrance),fComplex,T_Encumbrance);
-#endif
+//_DOUT("Returning encumbrance factor of %f -- Complex: [%f] Total: [%f]",(fComplex + T_Encumbrance),fComplex,T_Encumbrance);
+
 	return (fComplex + T_Encumbrance);
 }
 
@@ -394,9 +392,7 @@ float EncumbranceFactor(Actor* a, SInt32 STR, float fComplex){
 //Using a threshold, below which weapon speed starts to be impacted
 float FatigueFactor(Actor* a, UInt32 baseFatigue,float fatigueThreshold){
 	float fatigue = float(a->GetActorValue(kActorVal_Fatigue))/float(baseFatigue);
-#ifdef _DEBUG
-	_MESSAGE("Getting fatigue... curr %i base %i ratio %f thresh: %f",a->GetActorValue(kActorVal_Fatigue),a->GetBaseActorValue(kActorVal_Fatigue),fatigue,fatigueThreshold);
-#endif
+_DOUT("Getting fatigue... curr %i base %i ratio %f thresh: %f",a->GetActorValue(kActorVal_Fatigue),a->GetBaseActorValue(kActorVal_Fatigue),fatigue,fatigueThreshold);
 	return min(max(0.f,fatigue/fatigueThreshold),1.f);
 }
 

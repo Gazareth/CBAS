@@ -1,5 +1,23 @@
 #include "obse/GameObjects.h"
 
+//Convenient debug-only messaging
+#ifdef _DEBUG
+#define _DOUT(errmsg,...) _MESSAGE(errmsg,__VA_ARGS__)
+#else
+	#define _DOUT(errmsg)
+#endif
+
+//ELSE-based error messaging
+#if defined _DEBUG
+	#define PRSNK_ERR(errmsg,...) } else { _MESSAGE(errmsg,__VA_ARGS__);
+#else
+	#define PRSNK_ERR(errmsg)
+#endif
+
+
+
+
+#define MIN_WEAP_WEIGHT 1.f
 
 class FoundEquipped;
 
@@ -30,16 +48,17 @@ static CBAS_Armor* GetGauntlets(TESObjectREFR * thisObj);
 * GetWEAPON Functions
 ***************************/
 
+struct CBAS_Weapon {
+	float weight;
+	UInt32 ref;
+	UInt32 type;
+
+	CBAS_Weapon(float w = MIN_WEAP_WEIGHT, UInt32 r = 0, UInt32 t = TESObjectWEAP::kType_Max) : weight(max(MIN_WEAP_WEIGHT,w)),ref(r),type(t) {}
+};
 
 static bool FindEquippedWeapon(TESObjectREFR* thisObj, UInt32 slotIdx, FoundEquipped* foundEquippedFunctor, double* result);
 
-TESObjectWEAP* GetEquippedWeapon(TESObjectREFR * thisObj);
-
-
-#define ACTOR_STRENGTH_ENCUMBRANCE_MULT_DEFAULT 5.f
-#define ACTOR_STRENGTH_ENCUMBRANCE_MULT "fActorStrengthEncumbranceMult"
-
-static float EncumbranceMultiplier();
+CBAS_Weapon* GetEquippedWeapon(TESObjectREFR * thisObj);
 
 
 /***************************
@@ -52,7 +71,8 @@ static float EncumbranceMultiplier();
 /		old formula (not as punishing): 1 - (0.5/((5*(x^2.2) + 1)))
 ***************************/
 #define PRSNK_POW(b,p) (pow(max(0.f,b),p))
-#define PRSNK_FACTOR(x) (1.f - (.6f/((4.f*(PRSNK_POW(x,2.2f)) + 1.f))))
+//#define PRSNK_FACTOR(x) (1.f - (.6f/((4.f*(PRSNK_POW(x,2.2f)) + 1.f))))
+#define PRSNK_FACTOR(x) (1.f - (.7f/((3.f*(PRSNK_POW(x,2.2f)) + 1.f))))
 
 
 // - GetMaxWeaponSpeed -
@@ -74,7 +94,7 @@ static float EncumbranceMultiplier();
 * CharacterBasedAttackSpeed Functions
 ***************************/
 
-namespace CBAS {
+namespace CBAS_Lib {
 
 static enum
 {

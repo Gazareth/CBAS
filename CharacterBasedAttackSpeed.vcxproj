@@ -131,9 +131,10 @@
     <ClCompile Include="..\obse\obse\Script.cpp" />
     <ClCompile Include="..\obse\obse\Utilities.cpp" />
     <ClCompile Include="..\obse\StdAfx.cpp" />
-    <ClCompile Include="AttackingActor.cpp" />
-    <ClCompile Include="CBAS_ConfigHandler.cpp" />
-    <ClCompile Include="CharacterBasedAttackSpeed.cpp" />
+    <ClCompile Include="CBAS_Actor.cpp" />
+    <ClCompile Include="CBAS_ActorAnimData.cpp" />
+    <ClCompile Include="CBAS_Config.cpp" />
+    <ClCompile Include="CBAS_Lib.cpp" />
     <ClCompile Include="dllmain.c">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ForcedIncludeFiles>
@@ -160,10 +161,11 @@
     <ClInclude Include="..\obse\obse\Script.h" />
     <ClInclude Include="..\obse\obse\Utilities.h" />
     <ClInclude Include="..\obse\StdAfx.h" />
-    <ClInclude Include="AttackingActor.h" />
-    <ClInclude Include="CBAS_ConfigHandler.h" />
+    <ClInclude Include="CBAS_Actor.h" />
+    <ClInclude Include="CBAS_ActorAnimData.h" />
+    <ClInclude Include="CBAS_Config.h" />
     <ClInclude Include="inih\INIReader.h" />
-    <ClInclude Include="CharacterBasedAttackSpeed.h" />
+    <ClInclude Include="CBAS_Lib.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\obse\obse\GameRTTI_1_1.inl" />
