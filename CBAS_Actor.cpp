@@ -192,9 +192,11 @@ void CBAS_Actors::SetAttackSpeed(void* p){
 	bool aadExist = AnimDataMap.count((uintptr_t)p) > 0;		//find out if this animdata pointer has already an entry in the map
 	bool touched = false;	//has this pointer actually been processed fully or is it still not time
 	
+#if _DEBUG
 	if(aadExist){
-		_DOUT("%p timings: (%i - %i = %i)",p,GetTickCount(),AnimDataMap.at((uintptr_t)p),(GetTickCount() - AnimDataMap.at((uintptr_t)p)));
+		//_MESSAGE("%p timings: (%i - %i = %i)",p,GetTickCount(),AnimDataMap.at((uintptr_t)p),(GetTickCount() - AnimDataMap.at((uintptr_t)p)));
 	}
+#endif
 
 	if( aadExist && !TIME_PASSED(AnimDataMap.at((uintptr_t)p), TOUCH_INTERVAL) ){
 //_DOUT("Not checking %p because too soon (%i - %i = %i)",p,GetTickCount(),AnimDataMap.at((uintptr_t)p),(GetTickCount() - AnimDataMap.at((uintptr_t)p)));
@@ -226,7 +228,7 @@ Actor* CBAS_Actors::ResolveActorFromAnimData(void* p){
 				if( std::string(niExD->GetType()->name) == "TESObjectExtraData" ){
 					if( Actor* ActorFromAnimData = reinterpret_cast<Actor*>(((TESObjectExtraData*)niExD)->refr) ){
 						return ActorFromAnimData;
-					PRSNK_ERR("		Failed to cast actor at last hurdle! %s",niExD->GetType()->name)
+					PRSNK_ERR("		Failed to cast actor at last hurdle! %s",niExD->GetType()->name);
 					}
 				PRSNK_ERR("		NiExtraData does not match TESObjectExtraData! %s",niExD->GetType()->name);
 				}

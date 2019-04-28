@@ -48,7 +48,7 @@ void IniHandler::SetUseAllComponents() {
 	for(UInt8 i = 0;i<5;i++){
 		if(CBAS_IniEntries[i]->value != 1.f) return;
 	}
-	_MESSAGE("Using all components fully!");
+	_MESSAGE("[CBAS] -- Using all components {Fatigue, Encumbrance, Skill, Attribute, Speed} fully!");
 	bUseAllComponents = true;
 }
 

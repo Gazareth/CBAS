@@ -291,10 +291,7 @@ static float EncumbranceMultiplier(){
 	SettingInfo* setting = NULL;
 	if( GetGameSetting(ACTOR_STRENGTH_ENCUMBRANCE_MULT,&setting) ) {
 		enMult = setting->f;
-#ifdef _DEBUG
-	} else {
-		_MESSAGE("encumbrance mult GameSetting not found! ");
-#endif
+	PRSNK_ERR("CBAS - Encumbrance mult GameSetting not found! ");
 	}
 	return enMult;
 }
