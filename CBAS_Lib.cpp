@@ -336,12 +336,11 @@ namespace CBAS_Lib {
 // Simply get the weapon type and corresponding skill for actor
 // Then put through PRSNK_FACTOR() as a percentage, so that 0 skill halves the weapon speed, 50 skill has a ~25% penalty etc..
 float SkillFactor(Actor* a, UInt32 wepType) {
-	float skillVal = 100.f;
 	UInt32 skillToGet = WepTypeSkillMap[wepType];
-_DOUT("	Using 0x%x as skill for skill factor.",skillToGet);
+	if(skillToGet == kActorVal_OblivionMax) return 1.f;
+_DOUT("	Using 0x%x as skill for skill factor. Value: %d (WepType: %d).",skillToGet,a->GetActorValue(skillToGet),wepType);
 
-	skillVal = skillToGet == kActorVal_OblivionMax ? 100.f : a->GetActorValue(skillToGet);
-	return skillVal/100.f;
+	return a->GetActorValue(WepTypeSkillMap[wepType])*.01f;
 }
 
 
@@ -353,28 +352,34 @@ _DOUT("	Using 0x%x as skill for skill factor.",skillToGet);
 //	which becomes 7-10, so the ratio is around 1.00 -- no penalty.
 //	other character types will have say 15-20 agi 
 float AttrFactor(Actor* a, SInt32 STR, UInt32 wepType, float wepWeight) {
+	UInt32 attrToGet = WepTypeAttributeMap[wepType];
 	float attrF = 1.f;
-	UInt32 attrToGet = kActorVal_OblivionMax;
-	
-	if(wepType < kType_Staff){			//melee
-			attrF = float(STR)/wepWeight;
-_DOUT("	Using STR as attribute factor because melee weapon.");
-	} else if(wepType < kType_Bow){		//staff
-		attrF = (a->GetActorValue(kActorVal_Intelligence) + a->GetActorValue(kActorVal_Willpower))*.125f/wepWeight; //staffs can have weight as low as 5, high as 12, so contribution is further halved to give .125
-_DOUT("	Using INT+WILL as attribute factor because staff.");
-	} else if(wepType < kType_Max) {	//bow
-		attrF = a->GetActorValue(kActorVal_Agility)*.25f/wepWeight;		//bows can have weight as low as 8 and high as 22 so contribution from agility halved
-_DOUT("	Using AGI as attribute factor because bow.");
-	}
 
+	switch(attrToGet){
+		case CBAS_Attr_STR:
+			_DOUT("	Using STR as attribute factor because melee weapon (or default). Value: %d",STR);
+			attrF = ((float)STR)/wepWeight;
+			break;
+		case CBAS_Attr_INT_WILL:
+			_DOUT("	Using INT+WILL as attribute factor because staff. (INT: %d, WILL: %d)",a->GetActorValue(kActorVal_Intelligence),a->GetActorValue(kActorVal_Willpower));
+			attrF = ((float)(a->GetActorValue(kActorVal_Intelligence) + a->GetActorValue(kActorVal_Willpower)))/PRSNK_STAFF_VALUEMAP(wepWeight); //staffs can have weight as low as 5, high as 12, so contribution is quartered to give .125
+			break;
+		case CBAS_Attr_AGI:
+			_DOUT("	Using AGI as attribute factor because bow. (AGI: %d)",a->GetActorValue(kActorVal_Agility));
+			attrF = ((float)(a->GetActorValue(kActorVal_Agility)))/PRSNK_BOW_VALUEMAP(wepWeight);		//bows can have weight as low as 8 and high as 22 so contribution from agility halved
+			break;
+		default:
+			return 1.f;
+	}
 	return PRSNK_FACTOR(attrF);
 }
 
 
 // - EncumbranceFactor -
 float EncumbranceFactor(Actor* a, SInt32 STR, float fComplex){
+	if( STR == 0.f ) { return PRSNK_FACTOR(0.f); }
 	//get total encumbrance ratio
-	float T_Encumbrance = PRSNK_FACTOR(1 - (float(a->GetActorValue(kActorVal_Encumbrance))/float(a->GetActorValue(kActorVal_Strength)*EncumbranceMultiplier())));		//"1-x" cause less encumbered = more speed
+	float T_Encumbrance = PRSNK_FACTOR(1 - (float(a->GetActorValue(kActorVal_Encumbrance))/(((float)(STR))*EncumbranceMultiplier())));		//"1-x" cause less encumbered = more speed
 
 	//fComplex is a ratio of how much 'weight' (mathematical) the upper armor and gauntlets get compared to 
 	//I will probably set it to around .75f by default
@@ -415,9 +420,15 @@ float EncumbranceFactor(Actor* a, SInt32 STR, float fComplex){
 //Fatigue Factor
 //Using a threshold, below which weapon speed starts to be impacted
 float FatigueFactor(Actor* a, UInt32 baseFatigue,float fatigueThreshold){
-	float fatigue = float(a->GetActorValue(kActorVal_Fatigue))/float(baseFatigue);
-_DOUT("Getting fatigue... curr %i base %i ratio %f thresh: %f",a->GetActorValue(kActorVal_Fatigue),a->GetBaseActorValue(kActorVal_Fatigue),fatigue,fatigueThreshold);
-	return min(max(0.f,fatigue/fatigueThreshold),1.f);
+//_DOUT("Getting fatigue... curr %i base %i ratio %f thresh: %f",a->GetActorValue(kActorVal_Fatigue),a->GetBaseActorValue(kActorVal_Fatigue),fatigue,fatigueThreshold);
+	float fatigue = ((float)(a->GetActorValue(kActorVal_Fatigue))/(float)baseFatigue)/fatigueThreshold;
+	if( fatigue < 0.f ) {
+		return 0.f;
+	} else if (fatigue > 1.f) {
+		return 1.f;
+	} else {
+		return fatigue;
+	}
 }
 
 
