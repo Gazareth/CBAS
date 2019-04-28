@@ -273,12 +273,39 @@ CBAS_Weapon* GetEquippedWeapon(TESObjectREFR * thisObj)
 
 	if( FindEquippedWeapon(thisObj, slotIdx, &getObject, result) ) { 
 		TESObjectWEAP* Wep = (TESObjectWEAP*)LookupFormByID(*refResult);
-		wep = new CBAS_Weapon(Wep->weight.weight,Wep->refID,Wep->type);
+		wep = new CBAS_Weapon(Wep->weight.weight,Wep->reach,Wep->refID,Wep->type);
 	} else {
 		wep = new CBAS_Weapon();
+		_DOUT("CREATURE?");
+		wep->weight = 90.f;
+		if(TESCreature* creat = GetCreature(thisObj) ){
+			wep->weight = (.6f + ((float)(creat->attackReach)*.01f))*creat->footWeight;
+#ifdef _DEBUG
+			UInt8 Reach = creat->attackReach;
+			float fReach = (float)(creat->attackReach)*.01f;
+			float fWeight = creat->footWeight;
+			_MESSAGE("IS CREATURE!!! Reach: %d footWeight: %.1f",Reach,fWeight);
+			_MESSAGE("		ReachFactor: %.1f newWepWeight: %.1f actual: %.1f",(.65f + fReach),(.65f + fReach)*fWeight,wep->weight);
+#endif
+		}
 	}
 
 	return wep;
+}
+
+
+TESCreature* GetCreature(TESObjectREFR* thisObj)
+{
+	TESActorBase* actorBase = NULL;
+
+	if (!thisObj) return NULL;
+	actorBase = (TESActorBase*)Oblivion_DynamicCast(thisObj->baseForm, 0, RTTI_TESForm, RTTI_TESActorBase, 0);
+	if (!actorBase) return NULL;
+
+	if (TESCreature* creature = (TESCreature*)Oblivion_DynamicCast(actorBase, 0, RTTI_TESActorBase, RTTI_TESCreature, 0) ){
+		return creature;
+	}
+	return NULL;
 }
 
 

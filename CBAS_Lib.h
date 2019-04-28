@@ -148,12 +148,28 @@ struct CBAS_Weapon {
 	UInt32 ref;
 	UInt32 type;
 
-	CBAS_Weapon(float w = MIN_WEAP_WEIGHT, UInt32 r = 0, UInt32 t = TESObjectWEAP::kType_Max) : weight(max(MIN_WEAP_WEIGHT,w)),ref(r),type(t) {}
+	CBAS_Weapon(float w, float r, UInt32 rID, UInt32 t) : weight(max(MIN_WEAP_WEIGHT,w)),ref(rID),type(t) {
+		if( w <= 0 ) {		// it has no weight! be bound weapon, retrieve preassigned weight
+			weight = CBAS_Lib::DefaultWepWeights[t];
+			_DOUT("[DOUT] CBAS - Got bound weapon!? ref: %x type: %d, assigning weight of: %f",rID,t,weight);
+		}
+		if( r > 0.f && r < 1.f ) {
+			_DOUT("Weight is: %f, reducing by reach %f to give %f",weight,r,weight/r);
+			weight /= r;
+		}
+		//add arm weight
+		weight += ARM_BASE_WEIGHT;
+	}
+
+	//no weapon found
+	CBAS_Weapon() : weight(UNARMED_WEAP_WEIGHT), ref(0), type(CBAS_Lib::kType_HandToHand) {_DOUT("CBAS - UNARMED! EMPTY WEAPON!");}
 };
 
 static bool FindEquippedWeapon(TESObjectREFR* thisObj, UInt32 slotIdx, FoundEquipped* foundEquippedFunctor, double* result);
 
 CBAS_Weapon* GetEquippedWeapon(TESObjectREFR * thisObj);
+
+TESCreature* GetCreature(TESObjectREFR* thisObj);
 
 
 /***************************
