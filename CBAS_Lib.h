@@ -2,24 +2,119 @@
 
 //Convenient debug-only messaging
 #ifdef _DEBUG
-#define _DOUT(errmsg,...) _MESSAGE(errmsg,__VA_ARGS__)
+	#define _DOUT(errmsg, ...) _MESSAGE(errmsg,__VA_ARGS__)
 #else
-	#define _DOUT(errmsg)
+	#define _DOUT(errmsg, ...)
 #endif
 
 //ELSE-based error messaging
 #if defined _DEBUG
-	#define PRSNK_ERR(errmsg,...) } else { _MESSAGE(errmsg,__VA_ARGS__);
+	#define PRSNK_ERR(errmsg, ...) } else { _MESSAGE(errmsg,__VA_ARGS__)
 #else
-	#define PRSNK_ERR(errmsg)
+	#define PRSNK_ERR(errmsg, ...)
 #endif
 
+/***********************
+/ WEAPON WEIGHT BOUNDS
+**********************/
 
-
-
+//global
 #define MIN_WEAP_WEIGHT 1.f
 
+//staff
+#define MIN_STAFF_WEIGHT 5.f
+#define MAX_STAFF_WEIGHT 12.f
+#define RANGE_STAFF_WEIGHT (MAX_STAFF_WEIGHT - MIN_STAFF_WEIGHT)
+
+//bow
+#define MIN_BOW_WEIGHT 8.f
+#define MAX_BOW_WEIGHT 22.f
+#define RANGE_BOW_WEIGHT (MAX_BOW_WEIGHT - MIN_BOW_WEIGHT)
+
+//weight to default to for fists/handtohand
+#define UNARMED_WEAP_WEIGHT 50.f	//equates to around 1.5 attacks per second with MaxSpeed formula 8/2x^2.5
+#define ARM_BASE_WEIGHT 7.f			//this is added on to all weapons so that even the very lightest ones are slower
+
+#define BOUND_WEIGHT_FACTOR .8f	//bound weapons are slightly lighter than they should be due to being magic
+//Default weapon weights, used for bound weapons, based on damage done by bound weapon type (the average value then multiplied by 0.8 [BOUND WEIGHT FACTOR])
+#define BLADE1H_WEIGHT	6.f				// 7.5f
+#define BLADE2H_WEIGHT	49.6f			// 62.f - the bound claymore actually does more damage than any other claymore, picking the max claymore weight here which ends up being a little bonus for the bound version
+#define BLUNT1H_WEIGHT	28.8f			// 36.f - there are two bound blunt 1h types, this is an approximate average of the two weights for their damage values (18 - axe, 22 - mace)
+#define BLUNT2H_WEIGHT	74.4f			// 93.f - there isn't a bound blunt 2h in the base game, picking the heaviest to be safe
+#define STAFF_WEIGHT	9.6f			// 12.f - again, no bound staff so picking heaviest
+#define BOW_WEIGHT		13.6f			// 17.f - approx. based on damage of 15
+
+//
+
+
+/*********************/
+/*********************/
+/*********************/
+
+
 class FoundEquipped;
+
+namespace CBAS_Lib {
+
+	static enum
+	{
+		kType_BladeOneHand = 0,
+		kType_BladeTwoHand,
+		kType_BluntOneHand,
+		kType_BluntTwoHand,
+		kType_Staff,
+		kType_Bow,
+		kType_HandToHand,
+		kType_Max,
+	};
+
+	static enum
+	{
+		CBAS_Attr_STR,
+		CBAS_Attr_INT_WILL,
+		CBAS_Attr_AGI
+	};
+
+	//Map weapon type to default weapon weights	(these are used when weapon provided has no weight but it does have a type (i.e. bound weapon)
+	static float DefaultWepWeights[kType_Max+1] = {
+		BLADE1H_WEIGHT,			//blade1h - 0
+		BLADE2H_WEIGHT,			//blade2h - 1
+		BLUNT1H_WEIGHT,			//blunt1h - 2
+		BLUNT2H_WEIGHT,			//bl2h - 3
+		STAFF_WEIGHT,			//staff - 4
+		BOW_WEIGHT,				//bow - 5
+		UNARMED_WEAP_WEIGHT,	//handtohand (CBAS) - 6
+		MIN_WEAP_WEIGHT			//kType_Max
+	};
+
+	//Map CBAS weapon types to skills (every instruction counts!)
+	static UInt32 WepTypeSkillMap[kType_Max+1] = {
+		kActorVal_Blade,		//blade1h - 0
+		kActorVal_Blade,		//blade2h - 1
+		kActorVal_Blunt,		//blunt1h - 2
+		kActorVal_Blunt,		//bl2h - 3
+		kActorVal_OblivionMax,	//staff - 4
+		kActorVal_Marksman,		//bow - 5
+		kActorVal_HandToHand,	//handtohand (CBAS) - 6
+		kActorVal_OblivionMax	//kType_Max
+	};
+
+	//Map CBAS weapon types to attributes
+	static UInt32 WepTypeAttributeMap[kType_Max+1] = {
+		CBAS_Attr_STR,			//blade1h - 0
+		CBAS_Attr_STR,			//blade2h - 1
+		CBAS_Attr_STR,			//blunt1h - 2
+		CBAS_Attr_STR,			//bl2h - 3
+		CBAS_Attr_INT_WILL,		//staff... nothing - 4
+		CBAS_Attr_AGI,			//bow - 5
+		CBAS_Attr_STR,			//handtohand (CBAS) - 6
+		kActorVal_OblivionMax	//kType_Max
+	};
+
+}
+
+
+
 
 /***************************
 * Optimised for CBAS
@@ -90,33 +185,23 @@ CBAS_Weapon* GetEquippedWeapon(TESObjectREFR * thisObj);
 #define PRSNK_UNDERWEIGH(component,weight) ((1 - weight) + (component*weight))
 
 
+/**************************
+/ - Staff/Bow Value mapping -
+/
+/	Map the weights of bows or staves onto a ratio 0-100 or 1-200 so that it aligns with attribute factors
+/
+************************/
+#define PRSNK_STAFF_VALUEMAP(weight) (((weight - MIN_STAFF_WEIGHT)/RANGE_STAFF_WEIGHT)*200.f)
+#define PRSNK_BOW_VALUEMAP(weight) (((weight - MIN_BOW_WEIGHT)/RANGE_BOW_WEIGHT)*100.f)
+
+
+
+
 /***************************
 * CharacterBasedAttackSpeed Functions
 ***************************/
 
 namespace CBAS_Lib {
-
-static enum
-{
-	kType_BladeOneHand = 0,
-	kType_BladeTwoHand,
-	kType_BluntOneHand,
-	kType_BluntTwoHand,
-	kType_Staff,
-	kType_Bow,
-
-	kType_Max,
-};
-
-//Map weapon type to skill (every instruction counts!)
-static UInt32 WepTypeSkillMap[kType_Max] = {
-	kActorVal_Blade,		//blade1h - 0
-	kActorVal_Blade,		//blade2h - 1
-	kActorVal_Blunt,		//blunt1h - 2
-	kActorVal_Blunt,		//bl2h - 3
-	kActorVal_OblivionMax,	//staff... nothing - 4
-	kActorVal_Marksman		//bow - 5
-};
 
 
 // - SkillFactor -
