@@ -181,10 +181,9 @@ TESCreature* GetCreature(TESObjectREFR* thisObj);
 /		1 - (0.6/((4*(x^2.2) + 1)))		[where x is e.g. character Speed or Str out of 100]
 /		old formula (not as punishing): 1 - (0.5/((5*(x^2.2) + 1)))
 ***************************/
-#define PRSNK_POW(b,p) (pow(max(0.f,b),p))
+#define PRSNK_POW(b,p) (pow(max(0.0001f,b),p))	//must not go <= 0.f
 //#define PRSNK_FACTOR(x) (1.f - (.6f/((4.f*(PRSNK_POW(x,2.2f)) + 1.f))))
-#define PRSNK_FACTOR(x) (1.f - (.7f/((3.f*(PRSNK_POW(x,2.2f)) + 1.f))))
-
+#define PRSNK_FACTOR(x) (1.f - (.6f/((4.f*(PRSNK_POW(x,1.5f)) + 1.f))))
 
 // - GetMaxWeaponSpeed -
 // We have weight of weapon, we want to know how fast such a weapon could be swung... for this we get a new weight factor
@@ -192,7 +191,7 @@ TESCreature* GetCreature(TESObjectREFR* thisObj);
 //	Formula for this is:
 //		8/(2*(x^0.225))	[Where x is weight]
 //	m = minimum weapon weight (if people make mods with ridiculously light weapons, swing speed will go up to >6x per sec...)
-#define PRSNK_MAX_WEAP_SPEED(weight) (8.f / (2.f*pow(weight,.25f)))
+#define PRSNK_MAX_WEAP_SPEED(weight) (7.8f / (2.2f*pow(weight,.25f)))
 
 
 //This can be used to reduce the impact that a particular component of the main attack speed formula has
