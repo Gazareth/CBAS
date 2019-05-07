@@ -29,6 +29,9 @@ static IniEntry* CBAS_IniEntries[CBAS_EndEntries] = {
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Attribute",1.f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Speed",1.f),
 
+	new IniEntry(CBAS_HeadingsStrings[CBAS_Settings],"fCBAS_Multiplier",1.f),
+	new IniEntry(CBAS_HeadingsStrings[CBAS_Settings],"fCBAS_LowMult",.4f),
+
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Settings],"fCBAS_FatigueThreshold",1.f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Settings],"fCBAS_LocalisedEncumbrance",.75f),
 };
@@ -78,6 +81,8 @@ IniHandler::IniHandler() : bUseAllComponents(false)
 		}
 	}
 	SetUseAllComponents();
+	LowMult = (*this)(CBAS_Config::IniEntries::CBAS_LowMult)*10.f;
+	LowComplement = 1.f - (*this)(CBAS_Config::IniEntries::CBAS_LowMult);
 }
 
 float IniHandler::operator() (UInt32 iniEntryIndex) {

@@ -150,6 +150,17 @@ void MessageHandler(OBSEMessagingInterface::Message* msg)
 	}
 }
 
+static void CBASMain_LoadCallback(void * reserved){
+	g_cbasActors->LoadIniValues();
+
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+	_MESSAGE("[%s]: CBAS Reloaded Config because of Load Game!",asctime (timeinfo));
+}
+
 #endif
 
 extern "C" {
@@ -216,7 +227,6 @@ bool OBSEPlugin_Load(const OBSEInterface * obse)
 {
 	_MESSAGE("load");
 
-	g_pluginHandle = obse->GetPluginHandle();
 
 	/***************************************************************************
 	 *	
@@ -255,6 +265,11 @@ bool OBSEPlugin_Load(const OBSEInterface * obse)
 	}
 
 #ifdef _DEBUG
+	obse->SetOpcodeBase(0x2000);
+	g_pluginHandle = obse->GetPluginHandle();
+
+	g_serialization->SetLoadCallback(g_pluginHandle, CBASMain_LoadCallback);
+
 	// register to receive messages from OBSE
 	OBSEMessagingInterface* msgIntfc = (OBSEMessagingInterface*)obse->QueryInterface(kInterface_Messaging);
 	msgIntfc->RegisterListener(g_pluginHandle, "OBSE", MessageHandler);

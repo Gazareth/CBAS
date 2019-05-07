@@ -27,6 +27,9 @@ namespace CBAS_Config
 		CBAS_AttributeComponent,
 		CBAS_SpeedComponent,
 
+		CBAS_FinalMult,
+		CBAS_LowMult,
+
 		CBAS_FatigueThreshold,
 		CBAS_LocalisedEncumbrance,
 
@@ -52,12 +55,18 @@ class IniHandler {
 
 	void SetUseAllComponents();
 
+
+
 public:
 	IniHandler();
 
 	float operator() (UInt32 iniEntryIndex);
 
 	bool operator()();
+
+	float LowMult;			//used in PRSNK_FACTOR, lowest value of max attack speed is this ratio
+	float LowComplement;	//used in PRSNK_FACTOR, accounts for the weird relationship between the two constants in the formula (see constructor)
+
 };
 
 }	//end namespace

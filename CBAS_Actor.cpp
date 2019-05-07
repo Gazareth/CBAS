@@ -76,13 +76,18 @@ void CBAS_ActorVals::UpdateAttackSpeed(Actor* a) {
 	_MESSAGE("			MaxSpeed [weight: %f]: %f",wep->weight,PRSNK_MAX_WEAP_SPEED(wep->weight));
 	_MESSAGE("	Full modification factor (PRE PRSNK %f)",aSpd);
 #endif
-	aSpd = PRSNK_FACTOR(aSpd);
+
+	aSpd = PRSNK_FACTOR_CONFIG(aSpd,CBAS_IniHandler->LowComplement,CBAS_IniHandler->LowMult);
 
 	_DOUT("	Final calculation speed: [%f x %f]",PRSNK_MAX_WEAP_SPEED(wep->weight),aSpd);
 
 	aSpd *= PRSNK_MAX_WEAP_SPEED(wep->weight);
 
-	_DOUT("	Returning: %f",aSpd);
+	_DOUT("	Raw (POST PRSNK): %f",aSpd);
+
+	aSpd *= GETINI(CBAS_FinalMult);
+
+	_DOUT("	Final (Config Multiplier): %f",aSpd);
 }
 
 
@@ -138,6 +143,9 @@ _DOUT("			Cleansing animdata!");
 
 
 void CBAS_Actors::LoadIniValues() {
+#ifdef _DEBUG
+	delete CBAS_IniHandler;
+#endif
 	CBAS_IniHandler = new CBAS_Config::IniHandler();
 }
 
