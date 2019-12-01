@@ -34,6 +34,8 @@ OBSEScriptInterface * g_scriptInterface = NULL;	// make sure you assign to this
 //#include "Utilities.h"
 //#include <string>
 
+#define CBAS_VERSION "1.75"
+
 IDebugLog		gLog("Data/OBSE/Plugins/logs/CharacterBasedAttackSpeed.log");
 
 PluginHandle				g_pluginHandle = kPluginHandle_Invalid;
@@ -158,7 +160,7 @@ static void CBASMain_LoadCallback(void * reserved){
 
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
-	_MESSAGE("[%s]: CBAS Reloaded Config because of Load Game!",asctime (timeinfo));
+	_MESSAGE("[%s]: CBAS Reloaded Config because of Load Game!",strtok(asctime(timeinfo),"\n"));
 }
 
 #endif
@@ -225,7 +227,7 @@ bool OBSEPlugin_Query(const OBSEInterface * obse, PluginInfo * info)
 
 bool OBSEPlugin_Load(const OBSEInterface * obse)
 {
-	_MESSAGE("load");
+	_MESSAGE("Loading... [CharacterBasedAttackSpeed - v%s]",CBAS_VERSION);
 
 
 	/***************************************************************************

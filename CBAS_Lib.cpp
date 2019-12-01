@@ -277,9 +277,8 @@ CBAS_Weapon* GetEquippedWeapon(TESObjectREFR * thisObj)
 	} else {
 		wep = new CBAS_Weapon();
 		_DOUT("CREATURE?");
-		wep->weight = 90.f;
 		if(TESCreature* creat = GetCreature(thisObj) ){
-			wep->weight = (.6f + ((float)(creat->attackReach)*.01f))*creat->footWeight;
+			wep->weight = CREAT_BASE_WEIGHT + (float)(creat->attackReach)*.0125f*creat->footWeight;
 #ifdef _DEBUG
 			UInt8 Reach = creat->attackReach;
 			float fReach = (float)(creat->attackReach)*.01f;

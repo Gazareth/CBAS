@@ -32,8 +32,9 @@
 #define RANGE_BOW_WEIGHT (MAX_BOW_WEIGHT - MIN_BOW_WEIGHT)
 
 //weight to default to for fists/handtohand
-#define UNARMED_WEAP_WEIGHT 50.f	//equates to around 1.5 attacks per second with MaxSpeed formula 8/2x^2.5
-#define ARM_BASE_WEIGHT 7.f			//this is added on to all weapons so that even the very lightest ones are slower
+#define UNARMED_WEAP_WEIGHT 90.f				//equates to around 1.005 attacks per second with MaxSpeed formula 10/(2+x)^0.5
+#define ARM_BASE_WEIGHT 7.f						//this is added on to all weapons so that even the very lightest ones are slower
+#define CREAT_BASE_WEIGHT ARM_BASE_WEIGHT*3.f	//this is used in creature weight formula
 
 #define BOUND_WEIGHT_FACTOR .8f	//bound weapons are slightly lighter than they should be due to being magic
 //Default weapon weights, used for bound weapons, based on damage done by bound weapon type (the average value then multiplied by 0.8 [BOUND WEIGHT FACTOR])
@@ -158,6 +159,7 @@ struct CBAS_Weapon {
 			weight /= r;
 		}
 		//add arm weight
+		_DOUT("Add arm base weight: %f to give %f",ARM_BASE_WEIGHT,weight+ARM_BASE_WEIGHT);
 		weight += ARM_BASE_WEIGHT;
 	}
 
@@ -191,8 +193,7 @@ TESCreature* GetCreature(TESObjectREFR* thisObj);
 //	Let's say A weapon of 93 weight will have ~1.06 attacks per second; a weapon of 3 weight: ~3.5 aps
 //	Formula for this is:
 //		8/(2*(x^0.225))	[Where x is weight]
-//	m = minimum weapon weight (if people make mods with ridiculously light weapons, swing speed will go up to >6x per sec...)
-#define PRSNK_MAX_WEAP_SPEED(weight) (7.8f / (2.2f*pow(weight,.25f)))
+#define PRSNK_MAX_WEAP_SPEED(weight) (10.f / pow(2+weight,.5f)) //1.75
 
 
 //This can be used to reduce the impact that a particular component of the main attack speed formula has
