@@ -214,6 +214,14 @@ void CBAS_Actors::SetAttackSpeed(void* p){
 	touched = true;
 //_DOUT("Received pointer %p, attempting to get animdata...",p);
 	if ( Actor* a = ResolveActorFromAnimData(p) ){
+		//if it's a creature, and we're ignoring creatures... ignore
+		if( !GETINI(CBAS_Creatures) ) {
+			_DOUT("Not using creatures!");
+			if(TESCreature* creat = GetCreature(a)) {
+				_DOUT("%s (%X) is a creature! Exiting...",GetFullName(a),a->refID);
+				return;
+			}
+		}
 //_DOUT("	GOT ACTOR FROM %p",p);
 		(reinterpret_cast<CBAS_ActorAnimData*>(p))->t_period = AttackSpeedFromActor(a);
 	} else {

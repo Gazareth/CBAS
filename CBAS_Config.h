@@ -20,6 +20,7 @@ namespace CBAS_Config
 	enum IniEntries
 	{
 		CBAS_Enabled,
+		CBAS_Creatures,
 
 		CBAS_FatigueComponent,
 		CBAS_EncumbranceComponent,

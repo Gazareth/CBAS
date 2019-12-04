@@ -34,7 +34,7 @@ OBSEScriptInterface * g_scriptInterface = NULL;	// make sure you assign to this
 //#include "Utilities.h"
 //#include <string>
 
-#define CBAS_VERSION "1.75"
+#define CBAS_VERSION "1.76"
 
 IDebugLog		gLog("Data/OBSE/Plugins/logs/CharacterBasedAttackSpeed.log");
 
@@ -61,6 +61,14 @@ void* p_aad;		//pointer to actor anim data
 
 void* ESI_REGISTER;
 
+
+_declspec(naked) void EmptyHook(void)
+{
+	_asm {
+		fld dword ptr[esi+0xC0]				//load weapon speed onto floating point stack	-- this was the original instruction
+		jmp nextInstruction					//jump back to next instruction in base game code
+	}
+}
 
 _declspec(naked) void AttackSpeedHook(void)
 {
@@ -109,6 +117,18 @@ _declspec(naked) void AttackSpeedHook(void)
 
 #endif
 
+
+void DoHook() {
+	if( !(*CBAS_IniHandler)(CBAS_Config::IniEntries::CBAS_Enabled) ) {
+		_MESSAGE("[CharacterBasedAttackSpeed] -- has been set to disabled in the INI file.");
+		_MESSAGE("[CharacterBasedAttackSpeed] disabled.");
+		//hook nothing
+		WriteRelJump (AttackSpeedInstruction, (UInt32)&EmptyHook);
+	} else {
+		//hook attack speed algorithm on to location where it is
+		WriteRelJump (AttackSpeedInstruction, (UInt32)&AttackSpeedHook);
+	}
+}
 
 /*************************
 	Messaging API example
@@ -161,6 +181,8 @@ static void CBASMain_LoadCallback(void * reserved){
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
 	_MESSAGE("[%s]: CBAS Reloaded Config because of Load Game!",strtok(asctime(timeinfo),"\n"));
+
+	DoHook();
 }
 
 #endif
@@ -249,13 +271,7 @@ bool OBSEPlugin_Load(const OBSEInterface * obse)
 		//initialises ini object
 		g_cbasActors->LoadIniValues();
 
-		if(  !(*CBAS_IniHandler)(CBAS_Config::IniEntries::CBAS_Enabled) ) {
-			_MESSAGE("[CharacterBasedAttackSpeed] -- has been set to disabled in the INI file.");
-			_MESSAGE("[CharacterBasedAttackSpeed] disabled.");
-			return false;
-		}
-		//hook attack speed algorithm on to location where it is
-		WriteRelJump (AttackSpeedInstruction, (UInt32)&AttackSpeedHook);
+		DoHook();
 
 		// register to use string var interface
 		// this allows plugin commands to support '%z' format specifier in format string arguments

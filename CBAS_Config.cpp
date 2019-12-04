@@ -23,6 +23,7 @@ static char* CBAS_HeadingsStrings[CBAS_EndHeadings] = {
 
 static IniEntry* CBAS_IniEntries[CBAS_EndEntries] = {
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Meta],"bCBAS_Enabled",false,CBAS_iniBool),
+	new IniEntry(CBAS_HeadingsStrings[CBAS_Meta],"bCBAS_Creatures",false,CBAS_iniBool),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Fatigue",1.f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Encumbrance",1.f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Skill",1.f),
@@ -49,7 +50,7 @@ void IniHandler::SetUseAllComponents() {
 	};
 
 	for(UInt8 i = 0;i<5;i++){
-		if(CBAS_IniEntries[i]->value != 1.f) return;
+		if(CBAS_IniEntries[components[i]]->value != 1.f) return;
 	}
 	_MESSAGE("[CBAS] -- Using all components {Fatigue, Encumbrance, Skill, Attribute, Speed} fully!");
 	bUseAllComponents = true;
