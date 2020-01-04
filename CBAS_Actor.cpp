@@ -158,6 +158,12 @@ float CBAS_Actors::AttackSpeedFromActor(Actor* a){
 	CBAS_ActorVals* AV;
 	CBAS_ActorVals *n_AV = new CBAS_ActorVals(a);		//new actor vals to compare against
 
+	//No need to proceed if actor is wielding a weapon type that is disabled
+	if( ((n_AV->wep->type == CBAS_Lib::kType_Bow) && !GETINI(CBAS_Bows)) 
+		||  ((n_AV->wep->type == CBAS_Lib::kType_Staff) && !GETINI(CBAS_Staves)) ) {
+		return 1.0;
+	}
+
 	if( actorExists ){
 		AV = ActorValuesMap[a->refID];
 		AV = ActorValuesMap.at(a->refID);	//get actor from map

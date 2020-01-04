@@ -22,6 +22,9 @@ namespace CBAS_Config
 		CBAS_Enabled,
 		CBAS_Creatures,
 
+		CBAS_Bows,
+		CBAS_Staves,
+
 		CBAS_FatigueComponent,
 		CBAS_EncumbranceComponent,
 		CBAS_SkillComponent,
