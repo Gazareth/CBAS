@@ -34,7 +34,7 @@ OBSEScriptInterface * g_scriptInterface = NULL;	// make sure you assign to this
 //#include "Utilities.h"
 //#include <string>
 
-#define CBAS_VERSION "1.76"
+#define CBAS_VERSION "1.80"
 
 IDebugLog		gLog("Data/OBSE/Plugins/logs/CharacterBasedAttackSpeed.log");
 

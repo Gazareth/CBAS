@@ -336,7 +336,11 @@ namespace CBAS_Lib {
 // Then put through PRSNK_FACTOR() as a percentage, so that 0 skill halves the weapon speed, 50 skill has a ~25% penalty etc..
 float SkillFactor(Actor* a, UInt32 wepType) {
 	UInt32 skillToGet = WepTypeSkillMap[wepType];
-	if(skillToGet == kActorVal_OblivionMax) return 1.f;
+	if(skillToGet == kActorVal_OblivionMax) {
+		if( wepType == kType_Staff ) {
+			return PRSNK_FACTOR(pow((0.005f*(a->GetActorValue(kActorVal_Intelligence) + a->GetActorValue(kActorVal_Willpower))),2.f));		//staves don't have an attribute so it's an average of INT and WILL, squared
+		} else return 1.f;
+	}
 _DOUT("	Using 0x%x as skill for skill factor. Value: %d (WepType: %d).",skillToGet,a->GetActorValue(skillToGet),wepType);
 
 	return a->GetActorValue(WepTypeSkillMap[wepType])*.01f;
@@ -361,11 +365,12 @@ float AttrFactor(Actor* a, SInt32 STR, UInt32 wepType, float wepWeight) {
 			break;
 		case CBAS_Attr_INT_WILL:
 			_DOUT("	Using INT+WILL as attribute factor because staff. (INT: %d, WILL: %d)",a->GetActorValue(kActorVal_Intelligence),a->GetActorValue(kActorVal_Willpower));
-			attrF = ((float)(a->GetActorValue(kActorVal_Intelligence) + a->GetActorValue(kActorVal_Willpower)))/PRSNK_STAFF_VALUEMAP(wepWeight); //staffs can have weight as low as 5, high as 12, so contribution is quartered to give .125
+			_DOUT(" STAFF VALUEMAP VAL: %f (weight: %f, MAX: %f, MIN: %f, RANGE: %f)",PRSNK_STAFF_VALUEMAP(wepWeight),wepWeight,MAX_STAFF_WEIGHT,MIN_STAFF_WEIGHT,RANGE_STAFF_WEIGHT);
+			attrF = pow((0.005f*(a->GetActorValue(kActorVal_Intelligence) + a->GetActorValue(kActorVal_Willpower))),2.f)/PRSNK_STAFF_VALUEMAP(wepWeight);
 			break;
 		case CBAS_Attr_AGI:
 			_DOUT("	Using AGI as attribute factor because bow. (AGI: %d)",a->GetActorValue(kActorVal_Agility));
-			attrF = ((float)(a->GetActorValue(kActorVal_Agility)))/PRSNK_BOW_VALUEMAP(wepWeight);		//bows can have weight as low as 8 and high as 22 so contribution from agility halved
+			attrF = ((float)(a->GetActorValue(kActorVal_Agility)))/PRSNK_BOW_VALUEMAP(wepWeight);
 			break;
 		default:
 			return 1.f;
@@ -383,7 +388,7 @@ float EncumbranceFactor(Actor* a, SInt32 STR, float fComplex){
 	//fComplex is a ratio of how much 'weight' (mathematical) the upper armor and gauntlets get compared to 
 	//I will probably set it to around .75f by default
 	//giving a .25 contribution of total weight slowing down attacks
-	if( fComplex > 0 ){
+	if( fComplex > 0.f ){
 		T_Encumbrance *= (1 - fComplex);	//"total encumbrance" contribution gets diminished
 
 		//(upperbody + arms) ranges: 6-18 (light) and 36-72 (heavy)
@@ -391,21 +396,26 @@ float EncumbranceFactor(Actor* a, SInt32 STR, float fComplex){
 		CBAS_Armor* chest = GetCuirass(a);
 		CBAS_Armor* hands = GetGauntlets(a);
 
+		bool chestHeavy = chest->isHeavy;
+		bool handsHeavy = hands->isHeavy;
+
+		int heavyArm = chestHeavy+handsHeavy;
+
 		//only retrieve armor skill if the armor type is in use
-		float LArm = chest->isHeavy+hands->isHeavy < 2 ? a->GetActorValue(kActorVal_LightArmor) : 1.0f;
-		float HArm = chest->isHeavy+hands->isHeavy > 0 ? a->GetActorValue(kActorVal_HeavyArmor) : 1.0f;
+		float LArm = heavyArm < 2 ? a->GetActorValue(kActorVal_LightArmor) : 1.0f;	//if < 2, must have one piece of light armor/clothing
+		float HArm = heavyArm > 0 ? a->GetActorValue(kActorVal_HeavyArmor) : 1.0f;
 
 		//Below are the actual ratios for how each part will affect weapon speed; we will just average them so they get equal contribution (hands should have more influence, but weigh less generally)
 		//
 		//Chest --	varies from 5-15 (light), 30-60 (heavy)
 		//Heavy: Take average of heavy arm and strength, divide by weight
 		//Light: light armor divided by 5 divided by weight
-		float ChestVal = PRSNK_FACTOR(chest->isHeavy ? (float(STR+HArm)*.5f/chest->weight) : (LArm*.2f/max(chest->weight,0.0001f)) );
+		float ChestVal = PRSNK_FACTOR(chestHeavy ? (float(STR+HArm)*.5f/max(chest->weight,0.0001f)) : (LArm*.2f/max(chest->weight,0.0001f)) );
 
 		//Hands -- varies from 1-3 (light), 6-12 (heavy)
 		//Heavy: Take average of heavy arm and str, divide by ~4.5, then weight
 		//Light: light armor divided by 32, then weight
-		float HandsVal = PRSNK_FACTOR(hands->isHeavy ? (float(STR+HArm)*.5f*.225f/hands->weight) : (LArm*.03125f/max(hands->weight,0.0001f)) );
+		float HandsVal = PRSNK_FACTOR(handsHeavy ? (float(STR+HArm)*.5f*.225f/max(hands->weight,0.0001f)) : (LArm*.03125f/max(hands->weight,0.0001f)) );
 
 		fComplex = fComplex*((ChestVal+HandsVal)*.5f);	//complex ratio contribution gets diminished, after finding average of chest/hands values
 	}

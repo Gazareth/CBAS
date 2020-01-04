@@ -21,15 +21,6 @@
 //global
 #define MIN_WEAP_WEIGHT 1.f
 
-//staff
-#define MIN_STAFF_WEIGHT 5.f
-#define MAX_STAFF_WEIGHT 12.f
-#define RANGE_STAFF_WEIGHT (MAX_STAFF_WEIGHT - MIN_STAFF_WEIGHT)
-
-//bow
-#define MIN_BOW_WEIGHT 8.f
-#define MAX_BOW_WEIGHT 22.f
-#define RANGE_BOW_WEIGHT (MAX_BOW_WEIGHT - MIN_BOW_WEIGHT)
 
 //weight to default to for fists/handtohand
 #define UNARMED_WEAP_WEIGHT 90.f				//equates to around 1.005 attacks per second with MaxSpeed formula 10/(2+x)^0.5
@@ -45,7 +36,18 @@
 #define STAFF_WEIGHT	9.6f			// 12.f - again, no bound staff so picking heaviest
 #define BOW_WEIGHT		13.6f			// 17.f - approx. based on damage of 15
 
-//
+//staff
+#define STAFF_ARM_BASE_MULTIPLIER 4.f
+#define STAFF_ARM_BASE_WEIGHT ARM_BASE_WEIGHT*STAFF_ARM_BASE_MULTIPLIER
+#define MIN_STAFF_WEIGHT (5.f + STAFF_ARM_BASE_WEIGHT)
+#define MAX_STAFF_WEIGHT (12.f + STAFF_ARM_BASE_WEIGHT)
+#define RANGE_STAFF_WEIGHT (MAX_STAFF_WEIGHT - MIN_STAFF_WEIGHT)
+
+//bow
+#define MIN_BOW_WEIGHT 8.f
+#define MAX_BOW_WEIGHT 22.f
+#define RANGE_BOW_WEIGHT (MAX_BOW_WEIGHT - MIN_BOW_WEIGHT)
+
 
 
 /*********************/
@@ -106,7 +108,7 @@ namespace CBAS_Lib {
 		CBAS_Attr_STR,			//blade2h - 1
 		CBAS_Attr_STR,			//blunt1h - 2
 		CBAS_Attr_STR,			//bl2h - 3
-		CBAS_Attr_INT_WILL,		//staff... nothing - 4
+		CBAS_Attr_INT_WILL,		//staff - 4
 		CBAS_Attr_AGI,			//bow - 5
 		CBAS_Attr_STR,			//handtohand (CBAS) - 6
 		kActorVal_OblivionMax	//kType_Max
@@ -158,9 +160,9 @@ struct CBAS_Weapon {
 			_DOUT("Weight is: %f, reducing by reach %f to give %f",weight,r,weight/r);
 			weight /= r;
 		}
-		//add arm weight
-		_DOUT("Add arm base weight: %f to give %f",ARM_BASE_WEIGHT,weight+ARM_BASE_WEIGHT);
-		weight += ARM_BASE_WEIGHT;
+		//add arm weight (staves take penalty of twice arm weight since they're generally light but magic is slow
+		weight += type == CBAS_Lib::kType_Staff ? STAFF_ARM_BASE_WEIGHT : ARM_BASE_WEIGHT;
+		_DOUT("Add arm base weight: %f to give %f",ARM_BASE_WEIGHT,weight);
 	}
 
 	//no weapon found
@@ -208,7 +210,7 @@ TESCreature* GetCreature(TESObjectREFR* thisObj);
 /	Map the weights of bows or staves onto a ratio 0-100 or 1-200 so that it aligns with attribute factors
 /
 ************************/
-#define PRSNK_STAFF_VALUEMAP(weight) (((weight - MIN_STAFF_WEIGHT)/RANGE_STAFF_WEIGHT)*200.f)
+#define PRSNK_STAFF_VALUEMAP(weight) (((weight - MIN_STAFF_WEIGHT)/RANGE_STAFF_WEIGHT))
 #define PRSNK_BOW_VALUEMAP(weight) (((weight - MIN_BOW_WEIGHT)/RANGE_BOW_WEIGHT)*100.f)
 
 
