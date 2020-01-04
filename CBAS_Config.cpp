@@ -28,11 +28,12 @@ static IniEntry* CBAS_IniEntries[CBAS_EndEntries] = {
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Encumbrance",1.f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Skill",1.f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Attribute",1.f),
-	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Speed",1.f),
+	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Alacrity",1.f),
 
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Settings],"fCBAS_Multiplier",1.f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Settings],"fCBAS_LowMult",.4f),
 
+	//new IniEntry(CBAS_HeadingsStrings[CBAS_Settings],"fCBAS_CBAS_Alacrity_SpeedAgi",0.5f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Settings],"fCBAS_FatigueThreshold",1.f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Settings],"fCBAS_LocalisedEncumbrance",.75f),
 };
@@ -46,7 +47,7 @@ void IniHandler::SetUseAllComponents() {
 		CBAS_EncumbranceComponent,
 		CBAS_SkillComponent,
 		CBAS_AttributeComponent,
-		CBAS_SpeedComponent
+		CBAS_AlacrityComponent
 	};
 
 	for(UInt8 i = 0;i<5;i++){

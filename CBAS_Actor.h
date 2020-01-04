@@ -17,6 +17,7 @@ struct CBAS_ActorVals {
 
 	//"tracked" character values. when changed- will trigger an attack speed change
 	const SInt32 SPD;
+	const SInt32 AGI;
 	const UInt32 _FTG;		//base fatigue -- this changes when STR,END,AGI,WILL change, so we can use this as a "tracker" for those four stats
 
 	CBAS_Weapon* wep;

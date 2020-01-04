@@ -23,6 +23,7 @@
 
 CBAS_ActorVals::CBAS_ActorVals(Actor* a) :
 		SPD(a->GetActorValue(kActorVal_Speed)),
+		AGI(a->GetActorValue(kActorVal_Agility)),
 		_FTG(a->GetBaseActorValue(kActorVal_Fatigue))
 	{
 		t = GetTickCount();
@@ -52,18 +53,19 @@ void CBAS_ActorVals::UpdateAttackSpeed(Actor* a) {
 	float encF = CBAS_Lib::EncumbranceFactor(a,STR,GETINI(CBAS_LocalisedEncumbrance));			//encumbrance
 	float skillF = CBAS_Lib::SkillFactor(a,wep->type);											//skill in equipped weapon (e.g. blade, blunt)
 
-	float attrF = CBAS_Lib::AttrFactor(a,STR,wep->type,wep->weight);										//main attribute factor, depends on weapon type, e.g. melee weapons use str, bows use agi
-	float spdF = SPD*.01f;																	//speed
+	float attrF = CBAS_Lib::AttrFactor(a,STR,wep->type,wep->weight);							//main attribute factor, depends on weapon type, e.g. melee weapons use str, bows use agi
+	float alacrF = SPD > AGI ? SPD*.01f : AGI*.01f;												//
+
 
 	if( (*CBAS_IniHandler)() ){		//this gets whether or not we should use all components
-		aSpd = ftgF*encF*skillF*attrF*spdF;
+		aSpd = ftgF*encF*skillF*attrF*alacrF;
 	} else {
 		aSpd = 
 			PRSNK_UNDERWEIGH(ftgF,GETINI(CBAS_FatigueComponent)) *
 			PRSNK_UNDERWEIGH(encF,GETINI(CBAS_FatigueComponent)) *
 			PRSNK_UNDERWEIGH(skillF,GETINI(CBAS_SkillComponent)) *
 			PRSNK_UNDERWEIGH(attrF,GETINI(CBAS_AttributeComponent)) *
-			PRSNK_UNDERWEIGH(spdF,GETINI(CBAS_SpeedComponent));
+			PRSNK_UNDERWEIGH(alacrF,GETINI(CBAS_AlacrityComponent));
 	}
 
 #if _DEBUG
@@ -72,7 +74,7 @@ void CBAS_ActorVals::UpdateAttackSpeed(Actor* a) {
 	_MESSAGE("		Encumbrance factor: %f",encF);
 	_MESSAGE("		Skill factor: %f",skillF);
 	_MESSAGE("		Attribute factor: %f",attrF);
-	_MESSAGE("		Speed factor: %f",spdF);
+	_MESSAGE("		Alacrity factor: %f",alacrF);
 	_MESSAGE("			MaxSpeed [weight: %f]: %f",wep->weight,PRSNK_MAX_WEAP_SPEED(wep->weight));
 	_MESSAGE("	Full modification factor (PRE PRSNK %f)",aSpd);
 #endif
@@ -223,6 +225,8 @@ void CBAS_Actors::SetAttackSpeed(void* p){
 			}
 		}
 //_DOUT("	GOT ACTOR FROM %p",p);
+		//Change the time period of the animation to the desired attack speed
+		_DOUT("CURRENT PERIOD IS: %f",(reinterpret_cast<CBAS_ActorAnimData*>(p))->t_period);
 		(reinterpret_cast<CBAS_ActorAnimData*>(p))->t_period = AttackSpeedFromActor(a);
 	} else {
 		//if we can't get actor

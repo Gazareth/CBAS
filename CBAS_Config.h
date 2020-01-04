@@ -26,11 +26,12 @@ namespace CBAS_Config
 		CBAS_EncumbranceComponent,
 		CBAS_SkillComponent,
 		CBAS_AttributeComponent,
-		CBAS_SpeedComponent,
+		CBAS_AlacrityComponent,
 
 		CBAS_FinalMult,
 		CBAS_LowMult,
 
+		//CBAS_Alacrity_SpeedAgi,
 		CBAS_FatigueThreshold,
 		CBAS_LocalisedEncumbrance,
 
