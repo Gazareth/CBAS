@@ -20,10 +20,11 @@ namespace CBAS_Config
 	enum IniEntries
 	{
 		CBAS_Enabled,
-		CBAS_Creatures,
 
-		CBAS_Bows,
+		CBAS_Creatures,
+		CBAS_Hands,
 		CBAS_Staves,
+		CBAS_Bows,
 
 		CBAS_FatigueComponent,
 		CBAS_EncumbranceComponent,

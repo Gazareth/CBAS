@@ -279,6 +279,7 @@ CBAS_Weapon* GetEquippedWeapon(TESObjectREFR * thisObj)
 		_DOUT("CREATURE?");
 		if(TESCreature* creat = GetCreature(thisObj) ){
 			wep->weight = CREAT_BASE_WEIGHT + (float)(creat->attackReach)*.0125f*creat->footWeight;
+			wep->type = CBAS_Lib::kType_Creature;
 #ifdef _DEBUG
 			UInt8 Reach = creat->attackReach;
 			float fReach = (float)(creat->attackReach)*.01f;

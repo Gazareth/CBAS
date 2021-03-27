@@ -191,8 +191,6 @@ extern "C" {
 
 bool OBSEPlugin_Query(const OBSEInterface * obse, PluginInfo * info)
 {
-	_MESSAGE("query");
-
 	// fill out the info structure
 	info->infoVersion = PluginInfo::kInfoVersion;
 	info->name = "CharacterBasedAttackSpeed";
@@ -203,7 +201,7 @@ bool OBSEPlugin_Query(const OBSEInterface * obse, PluginInfo * info)
 	{
 		if(obse->obseVersion < OBSE_VERSION_INTEGER)
 		{
-			_ERROR("OBSE version too old (got %08X expected at least %08X)", obse->obseVersion, OBSE_VERSION_INTEGER);
+			_ERROR("OBSE version older than expected (got %08X instead of %08X)", obse->obseVersion, OBSE_VERSION_INTEGER);
 			//return false; //TODO: UNCOMMENT THIS! -- sort out versions
 		}
 

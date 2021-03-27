@@ -29,6 +29,7 @@
 
 #define BOUND_WEIGHT_FACTOR .8f	//bound weapons are slightly lighter than they should be due to being magic
 //Default weapon weights, used for bound weapons, based on damage done by bound weapon type (the average value then multiplied by 0.8 [BOUND WEIGHT FACTOR])
+//										// \/ - Previous values
 #define BLADE1H_WEIGHT	6.f				// 7.5f
 #define BLADE2H_WEIGHT	49.6f			// 62.f - the bound claymore actually does more damage than any other claymore, picking the max claymore weight here which ends up being a little bonus for the bound version
 #define BLUNT1H_WEIGHT	28.8f			// 36.f - there are two bound blunt 1h types, this is an approximate average of the two weights for their damage values (18 - axe, 22 - mace)
@@ -68,6 +69,7 @@ namespace CBAS_Lib {
 		kType_Staff,
 		kType_Bow,
 		kType_HandToHand,
+		kType_Creature,
 		kType_Max,
 	};
 

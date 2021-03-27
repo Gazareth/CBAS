@@ -160,7 +160,8 @@ float CBAS_Actors::AttackSpeedFromActor(Actor* a){
 
 	//No need to proceed if actor is wielding a weapon type that is disabled
 	if( ((n_AV->wep->type == CBAS_Lib::kType_Bow) && !GETINI(CBAS_Bows)) 
-		||  ((n_AV->wep->type == CBAS_Lib::kType_Staff) && !GETINI(CBAS_Staves)) ) {
+		||  ((n_AV->wep->type == CBAS_Lib::kType_Staff) && !GETINI(CBAS_Staves))
+		||  ((n_AV->wep->type == CBAS_Lib::kType_HandToHand) && !GETINI(CBAS_Hands)) ) {
 		return 1.0;
 	}
 

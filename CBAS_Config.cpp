@@ -23,10 +23,11 @@ static char* CBAS_HeadingsStrings[CBAS_EndHeadings] = {
 
 static IniEntry* CBAS_IniEntries[CBAS_EndEntries] = {
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Meta],"bCBAS_Enabled",false,CBAS_iniBool),
-	new IniEntry(CBAS_HeadingsStrings[CBAS_Meta],"bCBAS_Creatures",false,CBAS_iniBool),
 
-	new IniEntry(CBAS_HeadingsStrings[CBAS_Meta],"bCBAS_Bows",false,CBAS_iniBool),
+	new IniEntry(CBAS_HeadingsStrings[CBAS_Meta],"bCBAS_Creatures",false,CBAS_iniBool),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Meta],"bCBAS_Staves",false,CBAS_iniBool),
+	new IniEntry(CBAS_HeadingsStrings[CBAS_Meta],"bCBAS_Hands",false,CBAS_iniBool),
+	new IniEntry(CBAS_HeadingsStrings[CBAS_Meta],"bCBAS_Bows",false,CBAS_iniBool),
 
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Fatigue",1.f),
 	new IniEntry(CBAS_HeadingsStrings[CBAS_Components],"fCBAS_Encumbrance",1.f),
